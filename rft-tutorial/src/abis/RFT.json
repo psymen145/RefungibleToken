@@ -6641,12 +6641,12 @@
         }
       },
       "links": {},
-      "address": "0x407cFdFaa496Acf19576CCB73441FF4DE1208896",
-      "transactionHash": "0xf3290f6f9a767b1955bee6f4860d5e0df0c0f88974249854ca5ac7b238631d80"
+      "address": "0x226D0651A4914c52fEafE3D0913b5C9440CEa080",
+      "transactionHash": "0x378f54e7c69d3d38eccda7a0a139673166e400d4aa07663156909a10fbbd794e"
     }
   },
   "schemaVersion": "3.3.1",
-  "updatedAt": "2020-11-01T23:36:36.101Z",
+  "updatedAt": "2020-10-29T23:46:33.460Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

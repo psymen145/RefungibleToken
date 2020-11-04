@@ -1,26 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Root from './components/root';
-import configureStore from './store/store';
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware, compose } from 'redux';
+import reduxThunk from 'redux-thunk';
 
-document.addEventListener("DOMContentLoaded", () => {
-  const root = document.getElementById('root');
-  let store;
-  if (window.currentUser) {
-    const preloadedState = {
-      session: { id: window.currentUser.id },
-        entities: {
-          users: { [window.currentUser.id]: window.currentUser}
-        }
-    };
+import App from './components/App';
+import reducers from './reducers';
 
-    store = configureStore(preloadedState);
-    delete window.currentUser;
-  } else {
-    store = configureStore();
-  }
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const store = createStore(
+  reducers,
+  composeEnhancers(applyMiddleware(reduxThunk))
+);
 
-  window.store = store;
-
-  ReactDOM.render(<Root store={store}/>, root);
-});
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+);
