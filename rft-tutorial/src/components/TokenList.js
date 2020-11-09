@@ -40,6 +40,7 @@ class TokenList extends React.Component {
 
     const daiToken = new web3.eth.Contract(DaiABI, this.state.daiTokenAddress);
     let daiTokenBalance = await daiToken.methods.balanceOf(this.state.account).call();
+    console.log(daiTokenBalance);
   }
 
   render() {
