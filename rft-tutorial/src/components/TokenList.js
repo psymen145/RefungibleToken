@@ -1,13 +1,19 @@
 import React from 'react';
 import Web3 from 'web3';
 import DaiABI from '../abis/DAI.json';
+import RftABI from '../abis/RFT.json';
 
 class TokenList extends React.Component {
   state = {
     account: null,
     daiToken: null,
-    daiBalance: null,
-    daiTokenAddress: '0x6b175474e89094c44da98b954eedeac495271d0f'
+    daiBalance: 0,
+    ethBalance: 0,
+    daiVersion: 0,
+    validNFT: false,
+    nftAddrVal: '',
+    icoShareAmount: 0,
+    RFTBalance: 0
   }
 
   constructor(props) {
@@ -36,11 +42,62 @@ class TokenList extends React.Component {
     const accounts = await web3.eth.getAccounts();
     this.setState({ account: accounts[0] });
 
-    const networkId = await web3.eth.net.getId();
+    let ethBalance = await web3.eth.getBalance(this.state.account);
+    ethBalance = web3.utils.fromWei(ethBalance);
+    this.setState({ ethBalance });
 
-    const daiToken = new web3.eth.Contract(DaiABI, this.state.daiTokenAddress);
-    let daiTokenBalance = await daiToken.methods.balanceOf(this.state.account).call();
-    console.log(daiTokenBalance);
+    const networkId = await web3.eth.net.getId();
+    const daiTokenData = DaiABI.networks[networkId];
+
+    if (daiTokenData) {
+      const daiToken = new web3.eth.Contract(DaiABI.abi, daiTokenData.address);
+      let daiBalance = await daiToken.methods.balanceOf(this.state.account).call();
+      let daiVersion = await daiToken.methods.version().call(); 
+      await daiToken.methods.mint(this.state.account, '1000').call();
+      this.setState({ daiVersion });
+      this.setState({ daiBalance });
+    }
+  }
+
+  loadRFTDetails = async () => {
+    const web3 = window.web3;
+
+    if (this.state.nftAddrVal && web3.utils.isAddress(this.state.nftAddrVal)) {
+      this.setState({ validNFT: true });
+
+      const networkId = await web3.eth.net.getId();
+      const rftTokenData = RftABI.networks[networkId];
+
+      if (rftTokenData) {
+        const rftToken = new web3.eth.Contract(RftABI.abi, rftTokenData.address);
+        rftToken.
+      }
+
+    } else {
+      this.setState({ validNFT: false });
+    }
+  }
+
+  renderRFTDetails() {
+    if(this.state.validNFT) {
+      return (
+        <>
+          <h4>Shares Owned: </h4>
+          <div>
+            Share Amount:
+            <input type="text"
+                  name="share-amt"
+                  className="form-control"
+                  value={this.state.icoShareAmount}
+                  onChange={e => {this.setState({ icoShareAmount: e.target.value })}}
+                  />
+          </div>
+          <div>
+            <button className="btn btn-primary">Buy ICO</button>
+          </div>
+        </>
+      )
+    }
   }
 
   render() {
@@ -51,8 +108,28 @@ class TokenList extends React.Component {
           Connected account: {this.state.account} 
         </div>
         <div>
-          Dai Balance: 
+          Ethereum Balance: {this.state.ethBalance}
         </div>
+        <div>
+          Dai Balance: {this.state.daiBalance}, Dai Version: {this.state.daiVersion}
+        </div>
+
+        <hr/>
+
+        <div>
+          NFT Address:
+          <input type="text" 
+                name="nft-addr"
+                className="form-control"
+                value={this.state.nftAddrVal}
+                onChange={e => {this.setState({ nftAddrVal: e.target.value })}}/>
+          <button className="btn btn-primary" onClick={this.loadRFTDetails}>Load Details</button>
+        </div>
+
+        <hr/>
+
+        {this.renderRFTDetails()}
+
       </div>
     );
   }
